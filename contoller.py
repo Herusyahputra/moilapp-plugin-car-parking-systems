@@ -42,16 +42,16 @@ class Controller(QWidget):
         self.maps_any_g2_alpha = -40
         self.maps_any_g2_beta = 180
         self.maps_any_g2_zoom = 2
-        self.pitch_in_m2 = 37
-        self.yaw_in_m2 = -38
-        self.roll_in_m2 = 35
-        self.zoom_in_m2 = 1
-        self.rotate_in_m2 = -8
-        self.pitch_out_m2 = 20
-        self.yaw_out_m2= 38
-        self.roll_out_m2 = 1
-        self.zoom_out_m2 = 1
-        self.rotate_out_m2 = 19
+        self.pitch_in_m2 = 38
+        self.yaw_in_m2 = -35
+        self.roll_in_m2 = 37
+        self.zoom_in_m2 = 16
+        self.rotate_in_m2 = -33
+        self.pitch_out_m2 = 33
+        self.yaw_out_m2 = 18
+        self.roll_out_m2 = -1
+        self.zoom_out_m2 = 22
+        self.rotate_out_m2 = 23
         self.set_stylesheet()
 
     def set_stylesheet(self):
@@ -134,7 +134,7 @@ class Controller(QWidget):
         self.ui.spinBox_beta_4.setValue(self.yaw_in_m2)
         self.ui.spinBox_x_5.setValue(self.roll_in_m2)
         self.ui.spinBox_x_6.setValue(self.zoom_in_m2)
-        self.ui.spinBox_2.setValue(0)
+        self.ui.spinBox_2.setValue(self.rotate_in_m2)
 
         # gate out view
         # mode 1
@@ -146,7 +146,7 @@ class Controller(QWidget):
         self.ui.spinBox_alpha_3.setValue(self.maps_any_g2_alpha)
         self.ui.spinBox_beta_3.setValue(self.maps_any_g2_beta)
         self.ui.spinBox_zoom_3.setValue(self.maps_any_g2_zoom)
-        self.ui.spinBox_rotate_3.setValue(0)
+        self.ui.spinBox_rotate_3.setValue(self.rotate_out_m2)
 
         # mode 2
         self.ui.spinBox_alpha_6.setRange(-999, 999)
@@ -280,8 +280,8 @@ class Controller(QWidget):
         self.moildev = self.model.connect_to_moildev(parameter_name)
 
         # self.value_change_pano(0)
-        self.anypoint_m1()
-        # self.anypoint_m2()
+        #self.anypoint_m1()
+        self.anypoint_m2()
 
         self.showImg()
 
@@ -317,8 +317,8 @@ class Controller(QWidget):
 
         # self.model.show_image_to_label(self.ui.vidio_fisheye, img, width=280, scale_content=scale_content)
         # a = img.copy()
-        self.model.show_image_to_label(self.ui.vidio_gate_in, img, 480, scale_content=scale_content)
-        self.model.show_image_to_label(self.ui.vidio_gate_out, img, 480, scale_content=scale_content)
+        self.model.show_image_to_label(self.ui.vidio_gate_in, img, 720, scale_content=scale_content)
+        self.model.show_image_to_label(self.ui.vidio_gate_out, img, 720, scale_content=scale_content)
 
     def sementara(self, src):
         img = cv2.imread(src)
@@ -327,13 +327,13 @@ class Controller(QWidget):
         # self.predict_model()
         # self.cut_plate()
         # self.readimg()
-        plate = cv2.imread('./plugins/moilapp-plugin-parking-gate-system-aziz/processing/plate.jpeg')
+        plate = cv2.imread('./plugins/moilapp-plugin-parking-gate-system/processing/plate.jpeg')
 
         self.model.show_image_to_label(self.ui.label_plaeEntry, plate, 240)
 
     def showImg(self):
-        self.model.show_image_to_label(self.ui.vidio_gate_in, self.img_gate_in, 480)
-        self.model.show_image_to_label(self.ui.vidio_gate_out, self.img_gate_out, 480)
+        self.model.show_image_to_label(self.ui.vidio_gate_in, self.img_gate_in, 720)
+        self.model.show_image_to_label(self.ui.vidio_gate_out, self.img_gate_out, 720)
 
         self.model.show_image_to_label(self.ui.vidio_fisheye, self.img_fisheye, 280)
 
@@ -362,13 +362,13 @@ class Controller(QWidget):
         if status == 1:
             self.img_gate_in = img
             # self.img_rotate(img,rotate, 1)
-            self.model.show_image_to_label(self.ui.vidio_gate_in, img, 480)
-            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system-aziz/processing/result-g-in.png', img)
+            self.model.show_image_to_label(self.ui.vidio_gate_in, img, 720)
+            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system/processing/result-g-in.png', img)
         else:
             self.img_gate_out = img
             # self.img_rotate(img,rotate, 2)
-            self.model.show_image_to_label(self.ui.vidio_gate_out, img, 480)
-            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system-aziz/processing/result-g-out.png', img)
+            self.model.show_image_to_label(self.ui.vidio_gate_out, img, 720)
+            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system/processing/result-g-out.png', img)
 
     def anypoint_m1(self):
         # self.img_gate_in = self.moildev.anypoint_mode1(self.img_gate_in, 90, 180, 2)
@@ -379,6 +379,8 @@ class Controller(QWidget):
         self.img_gate_out = self.model.remap_image(self.img_gate_out, x_out, y_out)
 
     def anypoint_m2(self):
+        self.img_gate_in = self.model.rotate_image(self.img_fisheye, self.rotate_in_m2)
+        self.img_gate_out = self.model.rotate_image(self.img_fisheye, self.rotate_out_m2)
         x_in, y_in = self.moildev.maps_anypoint_mode2(self.pitch_in_m2, self.yaw_in_m2, self.roll_in_m2, self.zoom_in_m2)
         self.img_gate_in = self.model.remap_image(self.img_gate_in, x_in, y_in)
 
@@ -404,19 +406,19 @@ class Controller(QWidget):
             rotate = self.ui.spinBox_4.value()
 
         img = self.model.rotate_image(self.img_fisheye, rotate)
-        map_x, map_y = self.moildev.maps_anypoint_car(pitch, yaw, roll, zoom)
+        map_x, map_y = self.moildev.maps_anypoint_mode2(pitch, yaw, roll, zoom)
         img = self.model.remap_image(img, map_x, map_y)
 
         if status == 1:
             self.img_gate_in = img
             # self.img_rotate(img, rotate, 1)
-            self.model.show_image_to_label(self.ui.vidio_gate_in, img, 480)
-            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system-aziz/processing/result-g-in.png', img)
+            self.model.show_image_to_label(self.ui.vidio_gate_in, img, 720)
+            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system/processing/result-g-in.png', img)
         else:
             self.img_gate_out = img
             # self.img_rotate(img, rotate, 2)
-            self.model.show_image_to_label(self.ui.vidio_gate_out, img, 480)
-            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system-aziz/processing/result-g-out.png', img)
+            self.model.show_image_to_label(self.ui.vidio_gate_out, img, 720)
+            cv2.imwrite('./plugins/moilapp-plugin-parking-gate-system/processing/result-g-out.png', img)
 
     def close(self):
         self.ui.vidio_fisheye.setText(" ")
@@ -445,9 +447,9 @@ class Controller(QWidget):
         if status == 0:
             return img
         elif status == 1:
-            self.model.show_image_to_label(self.ui.vidio_gate_in, img, 480)
+            self.model.show_image_to_label(self.ui.vidio_gate_in, img, 720)
         elif status == 2:
-            self.model.show_image_to_label(self.ui.vidio_gate_out, img, 480)
+            self.model.show_image_to_label(self.ui.vidio_gate_out, img, 720)
 
     def predict_model(self):
         """RECUITMEN
@@ -460,22 +462,28 @@ class Controller(QWidget):
         import os
         import cv2
 """
+        import shutil
+
+        if os.path.isdir("/home/regaarz/FTDC/moilapp/runs/"):
+            shutil.rmtree("/home/regaarz/FTDC/moilapp/runs/")
         # Load a pretrained YOLOv8n model
-        model = YOLO("/home/gritzz/Documents/dataset-training/model-plate-white-(tempory).pt")
+        model = YOLO("/home/regaarz/FTDC/moilapp/src/plugins/moilapp-plugin-parking-gate-system/dataset-training/model-plate-white-(tempory).pt")
 
-        src_in = "./plugins/moilapp-plugin-parking-gate-system-aziz/processing/result-g-in.png"
-        src_out = "./plugins/moilapp-plugin-parking-gate-system-aziz/processing/result-g-out.png"
+        src_in = "./plugins/moilapp-plugin-parking-gate-system/processing/result-g-in.png"
+        src_out = "./plugins/moilapp-plugin-parking-gate-system/processing/result-g-out.png"
 
+        # Run inference on 'bus.jpg' with arguments
         # Run inference on 'bus.jpg' with arguments
         model.predict(src_in, save=True, imgsz=320, conf=0.5, save_txt=True)
         model.predict(src_out, save=True, imgsz=320, conf=0.5, save_txt=True)
 
-        label_in = '/home/gritzz/Documents/moilapp/runs/detect/predict/labels/result-g-in.txt'
-        label_out = '/home/gritzz/Documents/moilapp/runs/detect/predict/labels/result-g-out.txt'
+        label_in = '/home/regaarz/FTDC/moilapp/runs/detect/predict/labels/result-g-in.txt'
+        label_out = '/home/regaarz/FTDC/moilapp/runs/detect/predict/labels/result-g-out.txt'
         self.cut_plate(src_in, label_in, 1)
         self.cut_plate(src_out, label_out, 0)
 
-        self.pytes()
+        #self.pytes()
+        self.readimg()
 
     def tes_read(self):
         import pytesseract
@@ -532,11 +540,11 @@ class Controller(QWidget):
         crop = cv2.resize(crop, (480, 72))
         print(labels)
         if kondisi == 1:
-            cv2.imwrite("./plugins/moilapp-plugin-parking-gate-system-aziz/processing/plate-in.png", crop)
-            self.model.show_image_to_label(self.ui.label_plaeEntry, crop, 480, scale_content=False)
+            cv2.imwrite("./plugins/moilapp-plugin-parking-gate-system/processing/plate-in.png", crop)
+            self.model.show_image_to_label(self.ui.label_plaeEntry, crop, 720, scale_content=False)
         else:
-            cv2.imwrite("./plugins/moilapp-plugin-parking-gate-system-aziz/processing/plate-out.png", crop)
-            self.model.show_image_to_label(self.ui.label_plateExit, crop, 480, scale_content=False)
+            cv2.imwrite("./plugins/moilapp-plugin-parking-gate-system/processing/plate-out.png", crop)
+            self.model.show_image_to_label(self.ui.label_plateExit, crop, 720, scale_content=False)
 
         # plt.imshow(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
 
@@ -557,8 +565,8 @@ class Controller(QWidget):
     def pytes(self):
         import pytesseract
         print("mulai")
-        img1 = cv2.imread("./plugins/moilapp-plugin-parking-gate-system-aziz/processing/plate-in.png")
-        img2 = cv2.imread("./plugins/moilapp-plugin-parking-gate-system-aziz/processing/plate-out.png")
+        img1 = cv2.imread("./plugins/moilapp-plugin-parking-gate-system/processing/plate-in.png")
+        img2 = cv2.imread("./plugins/moilapp-plugin-parking-gate-system/processing/plate-out.png")
         img_rgb1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
         img_rgb2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
 
@@ -572,16 +580,25 @@ class Controller(QWidget):
         self.ui.label_plt_out.setText(f": {text_out}")
 
     def readimg(self):
+        img1 = cv2.imread("./plugins/moilapp-plugin-parking-gate-system/processing/plate-in.png")
+        img2 = cv2.imread("./plugins/moilapp-plugin-parking-gate-system/processing/plate-out.png")
+
         reader = easyocr.Reader(['id'])
-        result = reader.readtext(crop)
-        text = result[0][-2] + ' ' + result[1][-2]
+        result_img1 = reader.readtext(img1)
+        result_img2 = reader.readtext(img2)
+        text_img1 = result_img1[0][-2]
+        text_img2 = result_img2[0][-2]
 
-        plate_img = cv2.imread('/content/runs/detect/predict/test2.jpg')
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        plate_img = cv2.putText(plate_img, text, (x1, y1 + 80), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        print(text_img1)
+        print(text_img2)
 
-        cv2.imwrite('/content/drive/MyDrive/training/recognation.jpg', plate_img)
-        plt.imshow(cv2.cvtColor(plate_img, cv2.COLOR_BGR2RGB))
+        # plate_img = cv2.imread('/content/runs/detect/predict/test2.jpg')
+        # font = cv2.FONT_HERSHEY_SIMPLEX
+        # plate_img = cv2.putText(plate_img, text, (x1, y1 + 80), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        # plate_img = cv2.putText(plate_img, text, (x1, y1 + 80), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+
+        self.ui.label_plt_in.setText(f": {text_img1}")
+        self.ui.label_plt_out.setText(f": {text_img2}")
 
 class ParkingGateSystem(PluginInterface):
     def __init__(self):
