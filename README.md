@@ -1,5 +1,5 @@
 # moilapp-plugin-car-parking-systems
-*Last Update: May 9, 2024*
+*Last Update: August 9, 2024*
 
 ### *Create by*
 
@@ -14,9 +14,13 @@ Moilapp plugin car parking system is a plugin designed as an example for creatin
 
 ### Requirements
 ```
-moildev==4.0.0
-PyQt6==6.4.2
-PyYAML==5.4.1
+easyocr==1.7.1
+PyQt6==6.3.1
+pytesseract==0.3.10
+pyqt6-tools==6.3.1.3.3
+torch==2.3.1
+torchvision==0.18.1
+ultralytics==8.2.60
 ```
 
 ### How to Run | Usage
@@ -55,7 +59,8 @@ $ cd ../../
 $ python3 main.py
 ```
 11. select the plugin that has been marked:
-![](img_plugin/plugin_parking.jpeg)
+![](img_plugin/plugin_view.png)
+![](img_plugin/plugin_img.jpeg)
 
 ### Contact
 For any questions, suggestions, or concerns regarding the Plugin Application, please feel free to contact the repository owner at herusyahputra@telkomuniversity.ac.id. 
